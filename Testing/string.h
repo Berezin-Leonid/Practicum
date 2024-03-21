@@ -1,6 +1,7 @@
 #include <cstring>
 class String {
 public:
+    String();
     String(const char *);
     String(String const &);
     ~String();
@@ -12,6 +13,8 @@ private:
     char * str;
 };
 
+String::String(): str(nullptr)
+{}
 String::String(const char *_str)
 {
     if (_str == nullptr) {
