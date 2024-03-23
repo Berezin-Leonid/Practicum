@@ -131,7 +131,7 @@ VariableExpression::VariableExpression(IntVariable &v):
     //methods
 void VariableExpression::print(std::ostream & out)const
 {
-    std::cout << var -> perem();
+    out << var -> perem();
 }
 //end VariableExpression
 
@@ -156,7 +156,7 @@ LiteralExpression::LiteralExpression(int x):
     //methods
 void LiteralExpression::print(std::ostream & out)const
 {
-    std::cout << num;
+    out << num;
 }
 //end LiteralExpression
 
@@ -192,8 +192,8 @@ UnaryExpression::UnaryExpression(const Expression * middle_expr,
 void UnaryExpression::print(std::ostream & out)const
 {
     if (middle -> priority() < priority()) {
-        std::cout << "(";
-        std::cout << sign;
+        out << "(";
+        out << sign;
         middle -> print(out);
         out << ")";
     } else {
@@ -259,9 +259,9 @@ BinaryExpression::BinaryExpression(const Expression * left_expr,
 void BinaryExpression::print(std::ostream & out)const
 {
     if (left -> priority() < priority()) {
-        std::cout << "(";
+        out << "(";
         left -> print(out);
-        std::cout << ")";
+        out << ")";
     } else {
         left -> print(out);
     }
@@ -269,9 +269,9 @@ void BinaryExpression::print(std::ostream & out)const
     out << " " << sign << " ";
 
     if (right -> priority() <= priority()) {
-        std::cout << "(";
+        out << "(";
         right -> print(out);
-        std::cout << ")";
+        out << ")";
     } else {
         right -> print(out);
     }
