@@ -69,7 +69,7 @@ puts("abba");
 puts("central");
 puts("result = (76;6)");
 puts("diameter");
-puts("abba");
+puts("bear");
 */
     
 puts("bear");
