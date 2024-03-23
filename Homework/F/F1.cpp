@@ -56,8 +56,11 @@ int Expression::priority()const
 class IntVariable {
 public:
     ~IntVariable();
+    IntVariable(IntVariable const &);
     IntVariable(const char *);
     const char * perem()const;
+    IntVariable & operator =(IntVariable);
+    void swap(IntVariable &);
 private:
     char *perem_name;
     
@@ -69,6 +72,17 @@ IntVariable::~IntVariable()
     delete []perem_name;
 }
 
+IntVariable::IntVariable(IntVariable const & obj)
+{
+    if (obj.perem() == nullptr) {
+        perem_name = nullptr;
+        return;
+    }
+
+    perem_name = new char[strlen(obj.perem()) + 1];
+    strcpy(perem_name, obj.perem());
+}
+
 IntVariable::IntVariable(const char * str)
 {
     perem_name = new char[strlen(str) + 1];
@@ -76,6 +90,17 @@ IntVariable::IntVariable(const char * str)
 }
 
     //methods
+void IntVariable::swap(IntVariable & obj)
+{
+    std::swap(obj.perem_name, perem_name);
+}
+
+IntVariable & IntVariable::operator =(IntVariable obj)
+{
+    swap(obj);
+    return *this;
+}
+
 const char * IntVariable::perem()const
 {
     return perem_name;
@@ -386,6 +411,7 @@ std::ostream & operator <<(std::ostream & out, const Printer & obj)
     return out;
 }
 
+#ifdef LEO
 Expression *expr(IntVariable &v)
 {
     return new VariableExpression(v);
@@ -420,6 +446,7 @@ Expression *neg(Expression *operand)
 {
     return new NegativeExpression(operand);
 }
+#endif
 
 }//end namespace equation
 
