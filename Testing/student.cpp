@@ -17,7 +17,7 @@ public:
     void set_name(String const &);
     void set_surname(String const &);
     void set_age(int);
-    Student & operator =(Student const &);
+    Student & operator =(Student);
     
 private:
 
@@ -67,11 +67,11 @@ Student::~Student()
 {}
 
 
-Student & Student::operator =(Student const & obj)
+Student & Student::operator =(Student obj)
 {
-    name = obj.name;
-    surname = obj.surname;
-    age = obj.age;
+    std::swap(name, obj.name);
+    std::swap(surname, obj.surname);
+    std::swap(age, obj.age);
     return *this;
 }
 
