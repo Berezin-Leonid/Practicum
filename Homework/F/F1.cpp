@@ -26,30 +26,23 @@ enum {
 
 class Expression {
 public:
+    Expression();
     virtual ~Expression();
     Expression(int);
     virtual void print(std::ostream &)const = 0;
-    int priority()const;
-private:
-    int prior;
+    virtual int priority()const = 0;
 };
+
+Expression::Expression()
+{
+}
 
 //class Expression
     //constructors
 
 Expression::~Expression()
 {}
-
-Expression::Expression(int pr):
-    prior(pr)
-{}
-
     //methods
-
-int Expression::priority()const
-{
-    return prior;
-}
 //end Expression
 
 
@@ -115,6 +108,7 @@ public:
     ~VariableExpression();
     VariableExpression(IntVariable &);
     void print(std::ostream & out)const;
+    virtual int priority()const;
 private:
     const IntVariable * var;
 };
@@ -123,8 +117,7 @@ private:
 VariableExpression::~VariableExpression()
 {}
 
-VariableExpression::VariableExpression(IntVariable &v):
-        Expression(EL_PRT)
+VariableExpression::VariableExpression(IntVariable &v)
 {
     var = &v;
 }
@@ -133,6 +126,12 @@ void VariableExpression::print(std::ostream & out)const
 {
     out << var -> perem();
 }
+
+
+int VariableExpression::priority()const
+{
+    return EL_PRT;
+}
 //end VariableExpression
 
 class LiteralExpression: public Expression {
@@ -140,6 +139,7 @@ public:
     ~LiteralExpression();
     LiteralExpression(int);
     void print(std::ostream & out)const;
+    virtual int priority()const;
 private:
     int num;
 };
@@ -148,8 +148,7 @@ private:
 LiteralExpression::~LiteralExpression()
 {}
 
-LiteralExpression::LiteralExpression(int x):
-        Expression(EL_PRT)
+LiteralExpression::LiteralExpression(int x)
 {
     num = x;
 }
@@ -158,6 +157,11 @@ void LiteralExpression::print(std::ostream & out)const
 {
     out << num;
 }
+
+int LiteralExpression::priority()const
+{
+    return EL_PRT;
+}
 //end LiteralExpression
 
 
@@ -165,8 +169,9 @@ void LiteralExpression::print(std::ostream & out)const
 class UnaryExpression: public Expression {
 public:
     ~UnaryExpression();
-    UnaryExpression(const Expression *, char , int);
+    UnaryExpression(const Expression *, char);
     void print(std::ostream &)const;
+    virtual int priority()const = 0;
 private:
     const Expression *middle;
     char sign;
@@ -180,9 +185,8 @@ UnaryExpression::~UnaryExpression()
     delete middle;
 }
 
-UnaryExpression::UnaryExpression(const Expression * middle_expr,
-    char zn, int priority):
-        Expression(priority), sign(zn)
+UnaryExpression::UnaryExpression(const Expression * middle_expr, char zn):
+        sign(zn)
 {
     middle = middle_expr;
 }
@@ -208,6 +212,7 @@ class NegativeExpression: public UnaryExpression {
 public:
     ~NegativeExpression();
     NegativeExpression(const Expression *);
+    virtual int priority()const;
 private:
 };
 
@@ -218,10 +223,16 @@ NegativeExpression::~NegativeExpression()
 {}
 
 NegativeExpression::NegativeExpression(const Expression *middle_expr): 
-        UnaryExpression(middle_expr, '-', NEG_PRT)
+        UnaryExpression(middle_expr, '-')
 {}
 
     //methods
+
+int NegativeExpression::priority()const
+{
+    return NEG_PRT;
+}
+
 //end SumExpression
 
 
@@ -229,8 +240,9 @@ NegativeExpression::NegativeExpression(const Expression *middle_expr):
 class BinaryExpression: public Expression {
 public:
     ~BinaryExpression();
-    BinaryExpression(const Expression *,const Expression *,char , int);
+    BinaryExpression(const Expression *,const Expression *,char);
     void print(std::ostream &)const;
+    virtual int priority()const = 0;
 private:
     const Expression *left;
     const Expression *right;
@@ -247,8 +259,8 @@ BinaryExpression::~BinaryExpression()
 }
 
 BinaryExpression::BinaryExpression(const Expression * left_expr,
-    const Expression * right_expr,char zn, int priority):
-        Expression(priority), sign(zn)
+    const Expression * right_expr,char zn):
+        sign(zn)
 {
     left = left_expr;
     right = right_expr;
@@ -283,6 +295,7 @@ class SumExpression: public BinaryExpression {
 public:
     ~SumExpression();
     SumExpression(const Expression *, const Expression *);
+    virtual int priority()const;
 private:
 };
 
@@ -294,10 +307,14 @@ SumExpression::~SumExpression()
 
 SumExpression::SumExpression(const Expression *left_expr,
     const Expression *right_expr): 
-        BinaryExpression(left_expr, right_expr, '+', SUM_PRT)
+        BinaryExpression(left_expr, right_expr, '+')
 {}
 
     //methods
+int SumExpression::priority()const
+{
+    return SUM_PRT;
+}
 //end SumExpression
 
 
@@ -306,6 +323,7 @@ class SubExpression: public BinaryExpression {
 public:
     ~SubExpression();
     SubExpression(const Expression *, const Expression *);
+    virtual int priority()const;
 private:
 };
 
@@ -317,10 +335,16 @@ SubExpression::~SubExpression()
 
 SubExpression::SubExpression(const Expression *left_expr,
     const Expression *right_expr): 
-        BinaryExpression(left_expr, right_expr, '-', SUB_PRT)
+        BinaryExpression(left_expr, right_expr, '-')
 {}
 
     //methods
+
+int SubExpression::priority()const
+{
+    return SUB_PRT;
+}
+
 //end SubExpression
 
 
@@ -328,6 +352,7 @@ class MultiplyExpression: public BinaryExpression {
 public:
     ~MultiplyExpression();
     MultiplyExpression(const Expression *, const Expression *);
+    virtual int priority()const;
 private:
 };
 
@@ -339,10 +364,16 @@ MultiplyExpression::~MultiplyExpression()
 
 MultiplyExpression::MultiplyExpression(const Expression *left_expr,
     const Expression *right_expr): 
-        BinaryExpression(left_expr, right_expr, '*', MUL_PRT)
+        BinaryExpression(left_expr, right_expr, '*')
 {}
 
     //methods
+
+int MultiplyExpression::priority()const
+{
+    return MUL_PRT;
+}
+
 //end MultiplyExpression
 
 
@@ -351,6 +382,7 @@ class DivisionExpression: public BinaryExpression {
 public:
     ~DivisionExpression();
     DivisionExpression(const Expression *, const Expression *);
+    virtual int priority()const;
 private:
 };
 
@@ -362,10 +394,15 @@ DivisionExpression::~DivisionExpression()
 
 DivisionExpression::DivisionExpression(const Expression *left_expr,
     const Expression *right_expr): 
-        BinaryExpression(left_expr, right_expr, '/', DIV_PRT)
+        BinaryExpression(left_expr, right_expr, '/')
 {}
 
     //methods
+
+int DivisionExpression::priority()const
+{
+    return DIV_PRT;
+}
 //end DivisionExpression
 
 
