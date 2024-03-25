@@ -17,7 +17,7 @@ namespace equations
 enum {
     SUM_PRT = 1,
     SUB_PRT = 1,
-    MUL_PRT = 2,
+    MUL_PRT = 3,
     DIV_PRT = 3,
     NEG_PRT = 4,
     EL_PRT = 5
@@ -165,11 +165,11 @@ void LiteralExpression::print(std::ostream & out)const
 class UnaryExpression: public Expression {
 public:
     ~UnaryExpression();
-    UnaryExpression(const Expression *, const char *, int);
+    UnaryExpression(const Expression *, char , int);
     void print(std::ostream &)const;
 private:
     const Expression *middle;
-    const char *sign;
+    char sign;
 };
 
 //class UnaryExpression
@@ -181,7 +181,7 @@ UnaryExpression::~UnaryExpression()
 }
 
 UnaryExpression::UnaryExpression(const Expression * middle_expr,
-    const char *zn, int priority):
+    char zn, int priority):
         Expression(priority), sign(zn)
 {
     middle = middle_expr;
@@ -218,7 +218,7 @@ NegativeExpression::~NegativeExpression()
 {}
 
 NegativeExpression::NegativeExpression(const Expression *middle_expr): 
-        UnaryExpression(middle_expr, "-", NEG_PRT)
+        UnaryExpression(middle_expr, '-', NEG_PRT)
 {}
 
     //methods
@@ -229,12 +229,12 @@ NegativeExpression::NegativeExpression(const Expression *middle_expr):
 class BinaryExpression: public Expression {
 public:
     ~BinaryExpression();
-    BinaryExpression(const Expression *,const Expression *, const char *, int);
+    BinaryExpression(const Expression *,const Expression *,char , int);
     void print(std::ostream &)const;
 private:
     const Expression *left;
     const Expression *right;
-    const char *sign;
+    char sign;
 };
 
 //class BinaryExpression
@@ -247,7 +247,7 @@ BinaryExpression::~BinaryExpression()
 }
 
 BinaryExpression::BinaryExpression(const Expression * left_expr,
-    const Expression * right_expr, const char *zn, int priority):
+    const Expression * right_expr,char zn, int priority):
         Expression(priority), sign(zn)
 {
     left = left_expr;
@@ -294,7 +294,7 @@ SumExpression::~SumExpression()
 
 SumExpression::SumExpression(const Expression *left_expr,
     const Expression *right_expr): 
-        BinaryExpression(left_expr, right_expr, "+", SUM_PRT)
+        BinaryExpression(left_expr, right_expr, '+', SUM_PRT)
 {}
 
     //methods
@@ -317,7 +317,7 @@ SubExpression::~SubExpression()
 
 SubExpression::SubExpression(const Expression *left_expr,
     const Expression *right_expr): 
-        BinaryExpression(left_expr, right_expr, "-", SUB_PRT)
+        BinaryExpression(left_expr, right_expr, '-', SUB_PRT)
 {}
 
     //methods
@@ -339,7 +339,7 @@ MultiplyExpression::~MultiplyExpression()
 
 MultiplyExpression::MultiplyExpression(const Expression *left_expr,
     const Expression *right_expr): 
-        BinaryExpression(left_expr, right_expr, "*", MUL_PRT)
+        BinaryExpression(left_expr, right_expr, '*', MUL_PRT)
 {}
 
     //methods
@@ -362,7 +362,7 @@ DivisionExpression::~DivisionExpression()
 
 DivisionExpression::DivisionExpression(const Expression *left_expr,
     const Expression *right_expr): 
-        BinaryExpression(left_expr, right_expr, "/", DIV_PRT)
+        BinaryExpression(left_expr, right_expr, '/', DIV_PRT)
 {}
 
     //methods
