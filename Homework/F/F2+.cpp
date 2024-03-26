@@ -325,10 +325,8 @@ int SumExpression::priority()const
 
 NodeExpression * SumExpression::clone()const
 {
-    char *obj = new char[sizeof *this];
-    new (obj) SumExpression(this -> get_left() -> clone(),
+    returb new SumExpression(this -> get_left() -> clone(),
                             this -> get_right() -> clone());
-    return static_cast<NodeExpression *>(static_cast<void *>(obj));
 }
 //end SumExpression
 
