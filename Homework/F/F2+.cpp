@@ -341,7 +341,7 @@ private:
 
 //class Printer
     //constructors
-Printer::Printer(const NodeExpression & obj):
+Printer::Printer(const NodeExpression * obj):
     expr(obj)
 {}
     //methods
