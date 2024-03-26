@@ -1,16 +1,6 @@
 #include <iostream>
 #include <cstring>
 
-//priority of perem
-//
-//  + 1
-//  - 1
-//  * 2
-//  / 3
-//  -() 4
-//  element 5
-
-
 namespace equations
 {
 
@@ -23,29 +13,14 @@ enum {
     EL_PRT = 5
 };
 
-
 class Expression {
 public:
-    Expression();
-    virtual ~Expression();
+    Expression() = default;
+    virtual ~Expression() = default;
     Expression(int);
     virtual void print(std::ostream &)const = 0;
     virtual int priority()const = 0;
 };
-
-Expression::Expression()
-{
-}
-
-//class Expression
-    //constructors
-
-Expression::~Expression()
-{}
-    //methods
-//end Expression
-
-
 
 class IntVariable {
 public:
@@ -72,7 +47,6 @@ IntVariable::IntVariable(IntVariable const & obj)
         perem_name = nullptr;
         return;
     }
-
     perem_name = new char[strlen(obj.perem()) + 1];
     strcpy(perem_name, obj.perem());
 }
@@ -105,65 +79,44 @@ const char * IntVariable::perem()const
 
 class VariableExpression: public Expression {
 public:
-    ~VariableExpression();
     VariableExpression(IntVariable &);
     void print(std::ostream & out)const;
     virtual int priority()const;
 private:
     const IntVariable * var;
 };
-//class VariableExpression
-    //constructors
-VariableExpression::~VariableExpression()
+
+VariableExpression::VariableExpression(IntVariable &v):
+        var(&v)
 {}
 
-VariableExpression::VariableExpression(IntVariable &v)
-{
-    var = &v;
-}
-    //methods
 void VariableExpression::print(std::ostream & out)const
 {
     out << var -> perem();
 }
 
-
-int VariableExpression::priority()const
-{
-    return EL_PRT;
-}
-//end VariableExpression
+int VariableExpression::priority()const { return EL_PRT; }
 
 class LiteralExpression: public Expression {
 public:
-    ~LiteralExpression();
+    ~LiteralExpression() = default;
     LiteralExpression(int);
     void print(std::ostream & out)const;
     virtual int priority()const;
 private:
     int num;
 };
-//class LiteralExpression
-    //constructors
-LiteralExpression::~LiteralExpression()
+
+LiteralExpression::LiteralExpression(int x):
+        num(x)
 {}
 
-LiteralExpression::LiteralExpression(int x)
-{
-    num = x;
-}
-    //methods
 void LiteralExpression::print(std::ostream & out)const
 {
     out << num;
 }
 
-int LiteralExpression::priority()const
-{
-    return EL_PRT;
-}
-//end LiteralExpression
-
+int LiteralExpression::priority()const { return EL_PRT; }
 
 
 class UnaryExpression: public Expression {
@@ -210,31 +163,16 @@ void UnaryExpression::print(std::ostream & out)const
 
 class NegativeExpression: public UnaryExpression {
 public:
-    ~NegativeExpression();
     NegativeExpression(const Expression *);
     virtual int priority()const;
 private:
 };
 
-//class SumExpression
-
-    //constructors
-NegativeExpression::~NegativeExpression()
-{}
-
 NegativeExpression::NegativeExpression(const Expression *middle_expr): 
         UnaryExpression(middle_expr, '-')
 {}
 
-    //methods
-
-int NegativeExpression::priority()const
-{
-    return NEG_PRT;
-}
-
-//end SumExpression
-
+int NegativeExpression::priority()const { return NEG_PRT; }
 
 
 class BinaryExpression: public Expression {
@@ -293,119 +231,66 @@ void BinaryExpression::print(std::ostream & out)const
 
 class SumExpression: public BinaryExpression {
 public:
-    ~SumExpression();
     SumExpression(const Expression *, const Expression *);
     virtual int priority()const;
 private:
 };
-
-//class SumExpression
-
-    //constructors
-SumExpression::~SumExpression()
-{}
 
 SumExpression::SumExpression(const Expression *left_expr,
     const Expression *right_expr): 
         BinaryExpression(left_expr, right_expr, '+')
 {}
 
-    //methods
-int SumExpression::priority()const
-{
-    return SUM_PRT;
-}
-//end SumExpression
-
+int SumExpression::priority()const { return SUM_PRT; }
 
 
 class SubExpression: public BinaryExpression {
 public:
-    ~SubExpression();
     SubExpression(const Expression *, const Expression *);
     virtual int priority()const;
 private:
 };
-
-//class SubExpression
-
-    //constructors
-SubExpression::~SubExpression()
-{}
 
 SubExpression::SubExpression(const Expression *left_expr,
     const Expression *right_expr): 
         BinaryExpression(left_expr, right_expr, '-')
 {}
 
-    //methods
-
-int SubExpression::priority()const
-{
-    return SUB_PRT;
-}
-
-//end SubExpression
+int SubExpression::priority()const { return SUB_PRT; }
 
 
 class MultiplyExpression: public BinaryExpression {
 public:
-    ~MultiplyExpression();
     MultiplyExpression(const Expression *, const Expression *);
     virtual int priority()const;
 private:
 };
 
-//class MultiplyExpression
-
-    //constructors
-MultiplyExpression::~MultiplyExpression()
-{}
 
 MultiplyExpression::MultiplyExpression(const Expression *left_expr,
     const Expression *right_expr): 
         BinaryExpression(left_expr, right_expr, '*')
 {}
 
-    //methods
-
-int MultiplyExpression::priority()const
-{
-    return MUL_PRT;
-}
-
-//end MultiplyExpression
-
+int MultiplyExpression::priority()const { return MUL_PRT; }
 
 
 class DivisionExpression: public BinaryExpression {
 public:
-    ~DivisionExpression();
     DivisionExpression(const Expression *, const Expression *);
     virtual int priority()const;
 private:
 };
-
-//class DivisionExpression
-
-    //constructors
-DivisionExpression::~DivisionExpression()
-{}
 
 DivisionExpression::DivisionExpression(const Expression *left_expr,
     const Expression *right_expr): 
         BinaryExpression(left_expr, right_expr, '/')
 {}
 
-    //methods
-
 int DivisionExpression::priority()const
 {
     return DIV_PRT;
 }
-//end DivisionExpression
-
-
 
 
 class Printer {
@@ -416,38 +301,29 @@ private:
     const Expression * expr;
 };
 
-//class Printer
-    //constructors
 Printer::Printer(Expression const & obj):
     expr(&obj)
 {}
-    //methods
-const Expression * Printer::ptr_expression()const
-{
-    return expr;
-}
-//end Printer
+
+const Expression * Printer::ptr_expression()const { return expr; }
 
 class PrettyPrinter {
 public:
     Printer get_infix(Expression const &)const;
-private:
 };
 
-//class PrettyPrinter
-    //constructors
-    //methods
 Printer PrettyPrinter::get_infix(Expression const & obj)const
 {
     return Printer(obj);
 }
-//end PrettyPrinter
 
 std::ostream & operator <<(std::ostream & out, const Printer & obj)
 {
     obj.ptr_expression() -> print(out);
     return out;
 }
+
+/*====================================================================*/
 
 #ifdef LEO
 Expression *expr(IntVariable &v)
