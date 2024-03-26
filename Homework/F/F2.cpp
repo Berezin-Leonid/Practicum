@@ -254,8 +254,8 @@ UnaryExpression::UnaryExpression(const NodeExpression * middle_expr, char zn):
 void UnaryExpression::print(std::ostream & out)const
 {
     if (middle -> priority() < priority()) {
-        out << "(";
         out << sign;
+        out << "(";
         middle -> print(out);
         out << ")";
     } else {
