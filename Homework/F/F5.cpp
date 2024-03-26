@@ -58,7 +58,6 @@ main()
 //~A()
     return 0;
 }
-
 #endif
 
 int
