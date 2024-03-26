@@ -1,15 +1,6 @@
+
 #include <iostream>
 #include <cstring>
-
-//priority of perem
-//
-//  + 1
-//  - 1
-//  * 2
-//  / 3
-//  -() 4
-//  element 5
-
 
 namespace equations
 {
@@ -19,10 +10,6 @@ class IntVariable;
 NodeExpression *expr(IntVariable &v);
 NodeExpression *expr(int v);
 NodeExpression *plus(NodeExpression *left, NodeExpression *right);
-NodeExpression *minus(NodeExpression *left, NodeExpression *right);
-NodeExpression *mult(NodeExpression *left, NodeExpression *right);
-NodeExpression *div(NodeExpression *left, NodeExpression *right);
-NodeExpression *neg(NodeExpression *operand);
 
 enum {
     SUM_PRT = 1,
@@ -32,8 +19,6 @@ enum {
     NEG_PRT = 4,
     EL_PRT = 5
 };
-
-
 
 class IntVariable {
 public:
@@ -47,8 +32,7 @@ private:
     char *perem_name;
     
 };
-//class IntVariable
-    //constructors
+
 IntVariable::~IntVariable()
 {
     delete []perem_name;
@@ -71,7 +55,6 @@ IntVariable::IntVariable(const char * str)
     strcpy(perem_name, str);
 }
 
-    //methods
 void IntVariable::swap(IntVariable & obj)
 {
     std::swap(obj.perem_name, perem_name);
@@ -87,66 +70,44 @@ const char * IntVariable::perem()const
 {
     return perem_name;
 }
-//end IntVariable
-
 
 class NodeExpression {
 public:
-    NodeExpression();
-    virtual ~NodeExpression();
+    virtual ~NodeExpression() = default;
     virtual void print(std::ostream &)const = 0;
     virtual int priority()const = 0;
     virtual NodeExpression * clone()const = 0;
 };
 
-NodeExpression::NodeExpression()
-{
-}
-
-//class NodeExpression
-    //constructors
-
-NodeExpression::~NodeExpression()
-{}
-    //methods
-//end NodeExpression
-
-
-class Expression {
+class LiteralExpression: public NodeExpression {
 public:
-
-    Expression(int);
-    Expression(IntVariable &);
-    Expression(Expression const &);
+    LiteralExpression(int);
+    void print(std::ostream & out)const;
+    virtual int priority()const;
+    virtual NodeExpression * clone()const;
 private:
-    NodeExpression * node;
+    int num;
 };
 
-//class Expression
-    //constructors
-Expression::Expression(int x)
+LiteralExpression::LiteralExpression(int x):
+    num(x)
+{}
+
+void LiteralExpression::print(std::ostream & out)const
 {
-    node = expr(x);
+    out << num;
 }
 
-Expression::Expression(IntVariable &v)
+int LiteralExpression::priority()const { return EL_PRT; }
+
+NodeExpression * LiteralExpression::clone()const
 {
-    node = expr(v);
+    return new LiteralExpression(num);
 }
-
-Expression::Expression(Expression const &obj)
-{
-    this -> node = obj.node -> clone();
-}
-
-
-    //methods
-//end Expression
 
 class VariableExpression: public NodeExpression {
 public:
 
-    ~VariableExpression();
     VariableExpression(IntVariable &);
     void print(std::ostream & out)const;
     virtual int priority()const;
@@ -156,76 +117,77 @@ private:
 
     IntVariable * var;
 };
-//class VariableExpression
-    //constructors
-VariableExpression::~VariableExpression()
+
+VariableExpression::VariableExpression(IntVariable &v):
+        var(&v)
 {}
 
-VariableExpression::VariableExpression(IntVariable &v)
-{
-    var = &v;
-}
-    //methods
 void VariableExpression::print(std::ostream & out)const
 {
     out << var -> perem();
 }
 
 
-int VariableExpression::priority()const
-{
-    return EL_PRT;
-}
+int VariableExpression::priority()const { return EL_PRT; }
 
 NodeExpression * VariableExpression::clone()const
 {
-    return expr(*var);
+    return new VariableExpression(*var);
 }
 
-//end VariableExpression
 
-class LiteralExpression: public NodeExpression {
+class Expression {
 public:
-    ~LiteralExpression();
-    LiteralExpression(int);
-    void print(std::ostream & out)const;
-    virtual int priority()const;
-    virtual NodeExpression * clone()const;
+
+    Expression(int);
+    Expression(NodeExpression *);
+    Expression(IntVariable &);
+    Expression(Expression const &);
+    Expression & operator =(Expression);
+    ~Expression();
+
+    const NodeExpression * get_node()const;
 private:
-    int num;
+    NodeExpression * node;
 };
-//class LiteralExpression
-    //constructors
-LiteralExpression::~LiteralExpression()
+
+Expression::Expression(int x):
+        node(new LiteralExpression(x))
 {}
 
-LiteralExpression::LiteralExpression(int x)
+Expression::Expression(NodeExpression * obj):
+    node(obj)
+{}
+
+Expression::Expression(IntVariable &x):
+        node(new VariableExpression(x))
+{}
+
+Expression::Expression(Expression const &obj):
+    node(obj.node -> clone())
+{}
+
+Expression::~Expression()
 {
-    num = x;
-}
-    //methods
-void LiteralExpression::print(std::ostream & out)const
-{
-    out << num;
+    delete node;
 }
 
-int LiteralExpression::priority()const
+
+Expression & Expression::operator =(Expression obj)
 {
-    return EL_PRT;
+    std::swap(obj.node, this -> node);    
+    return *this;
 }
 
-NodeExpression * LiteralExpression::clone()const
+const NodeExpression* Expression::get_node()const
 {
-    return expr(num);
+    return node;
 }
-//end LiteralExpression
-
-
 
 class UnaryExpression: public NodeExpression {
 public:
     ~UnaryExpression();
-    UnaryExpression(const NodeExpression *, char);
+    UnaryExpression(const NodeExpression *,char);
     void print(std::ostream &)const;
     const NodeExpression * get_middle()const;
     virtual int priority()const = 0;
@@ -235,21 +197,16 @@ private:
     char sign;
 };
 
-//class UnaryExpression
-    //constructors
-
 UnaryExpression::~UnaryExpression()
 {
     delete middle;
 }
 
 UnaryExpression::UnaryExpression(const NodeExpression * middle_expr, char zn):
-        sign(zn)
+        middle(middle_expr)
 {
-    middle = middle_expr;
+    sign = zn;
 }
-
-    //methods
 
 void UnaryExpression::print(std::ostream & out)const
 {
@@ -264,50 +221,25 @@ void UnaryExpression::print(std::ostream & out)const
     }
 }
 
-const NodeExpression * UnaryExpression::get_middle()const
-{
-    return middle;
-}
-
-//end UnaryExpression
-
+const NodeExpression * UnaryExpression::get_middle()const { return middle; }
 
 class NegativeExpression: public UnaryExpression {
 public:
-    ~NegativeExpression();
     NegativeExpression(const NodeExpression *);
     int priority()const;
-    virtual NodeExpression * clone()const;
-private:
+    NodeExpression * clone()const;
 };
-
-//class NegativeExpression
-
-    //constructors
-NegativeExpression::~NegativeExpression()
-{}
 
 NegativeExpression::NegativeExpression(const NodeExpression *middle_expr): 
         UnaryExpression(middle_expr, '-')
 {}
 
-    //methods
-
-int NegativeExpression::priority()const
-{
-    return NEG_PRT;
-}
+int NegativeExpression::priority()const { return NEG_PRT; }
 
 NodeExpression * NegativeExpression::clone()const
 {
-    char *obj = new char[sizeof *this];
-    new (obj) NegativeExpression(this -> get_middle() -> clone());
-    return static_cast<NodeExpression *>(static_cast<void *>(obj));
+    return new NegativeExpression(this -> get_middle() -> clone());
 }
-
-//end SumExpression
-
-
 
 class BinaryExpression: public NodeExpression {
 public:
@@ -324,9 +256,6 @@ private:
     char sign;
 };
 
-//class BinaryExpression
-    //constructors
-
 BinaryExpression::~BinaryExpression()
 {
     delete left;
@@ -334,14 +263,11 @@ BinaryExpression::~BinaryExpression()
 }
 
 BinaryExpression::BinaryExpression(const NodeExpression * left_expr,
-    const NodeExpression * right_expr,char zn):
-        sign(zn)
+    const NodeExpression * right_expr, char zn):
+        left(left_expr), right(right_expr)
 {
-    left = left_expr;
-    right = right_expr;
+    sign = zn;
 }
-
-    //methods
 
 void BinaryExpression::print(std::ostream & out)const
 {
@@ -364,204 +290,117 @@ void BinaryExpression::print(std::ostream & out)const
     }
 }
 
-const NodeExpression * BinaryExpression::get_left()const
-{
-    return left;
-}
+const NodeExpression * BinaryExpression::get_left()const { return left; }
 
-const NodeExpression * BinaryExpression::get_right()const
-{
-    return right;
-}
-
-//end BinaryExpression
-
+const NodeExpression * BinaryExpression::get_right()const { return right; }
 
 class SumExpression: public BinaryExpression {
 public:
-    ~SumExpression();
     SumExpression(const NodeExpression *, const NodeExpression *);
     int priority()const;
     NodeExpression * clone()const;
-private:
 };
-
-//class SumExpression
-
-    //constructors
-SumExpression::~SumExpression()
-{}
 
 SumExpression::SumExpression(const NodeExpression *left_expr,
     const NodeExpression *right_expr): 
         BinaryExpression(left_expr, right_expr, '+')
 {}
 
-    //methods
-int SumExpression::priority()const
-{
-    return SUM_PRT;
-}
+int SumExpression::priority()const { return SUM_PRT; }
 
 NodeExpression * SumExpression::clone()const
 {
-    char *obj = new char[sizeof *this];
-    new (obj) SumExpression(this -> get_left() -> clone(),
+    return new SumExpression(this -> get_left() -> clone(),
                             this -> get_right() -> clone());
-    return static_cast<NodeExpression *>(static_cast<void *>(obj));
 }
-//end SumExpression
-
-
 
 class SubExpression: public BinaryExpression {
 public:
-    ~SubExpression();
     SubExpression(const NodeExpression *, const NodeExpression *);
     int priority()const;
     NodeExpression * clone()const;
-private:
 };
-
-//class SubExpression
-
-    //constructors
-SubExpression::~SubExpression()
-{}
 
 SubExpression::SubExpression(const NodeExpression *left_expr,
     const NodeExpression *right_expr): 
         BinaryExpression(left_expr, right_expr, '-')
 {}
 
-    //methods
-
-int SubExpression::priority()const
-{
-    return SUB_PRT;
-}
+int SubExpression::priority()const { return SUB_PRT; }
 
 NodeExpression * SubExpression::clone()const
 {
-    char *obj = new char[sizeof *this];
-    new (obj) SubExpression(this -> get_left() -> clone(),
+    return new SubExpression(this -> get_left() -> clone(),
                             this -> get_right() -> clone());
-    return static_cast<NodeExpression *>(static_cast<void *>(obj));
 }
-//end SubExpression
-
 
 class MultiplyExpression: public BinaryExpression {
 public:
-    ~MultiplyExpression();
     MultiplyExpression(const NodeExpression *, const NodeExpression *);
     int priority()const;
     NodeExpression * clone()const;
-private:
 };
-
-//class MultiplyExpression
-
-    //constructors
-MultiplyExpression::~MultiplyExpression()
-{}
 
 MultiplyExpression::MultiplyExpression(const NodeExpression *left_expr,
     const NodeExpression *right_expr): 
         BinaryExpression(left_expr, right_expr, '*')
 {}
 
-    //methods
-
-int MultiplyExpression::priority()const
-{
-    return MUL_PRT;
-}
+int MultiplyExpression::priority()const { return MUL_PRT; }
 
 NodeExpression * MultiplyExpression::clone()const
 {
-    char *obj = new char[sizeof *this];
-    new (obj) MultiplyExpression(this -> get_left() -> clone(),
-                                 this -> get_right() -> clone());
-    return static_cast<NodeExpression *>(static_cast<void *>(obj));
+    return new MultiplyExpression(this -> get_left() -> clone(),
+                            this -> get_right() -> clone());
 }
-//end MultiplyExpression
-
-
 
 class DivisionExpression: public BinaryExpression {
 public:
-    ~DivisionExpression();
     DivisionExpression(const NodeExpression *, const NodeExpression *);
     int priority()const;
     NodeExpression * clone()const;
-private:
 };
-
-//class DivisionExpression
-
-    //constructors
-DivisionExpression::~DivisionExpression()
-{}
 
 DivisionExpression::DivisionExpression(const NodeExpression *left_expr,
     const NodeExpression *right_expr): 
         BinaryExpression(left_expr, right_expr, '/')
 {}
 
-    //methods
-
-int DivisionExpression::priority()const
-{
-    return DIV_PRT;
-}
+int DivisionExpression::priority()const { return DIV_PRT; }
 
 NodeExpression * DivisionExpression::clone()const
 {
-    char *obj = new char[sizeof *this];
-    new (obj) DivisionExpression(this -> get_left() -> clone(),
+    return new DivisionExpression(this -> get_left() -> clone(),
                             this -> get_right() -> clone());
-    return static_cast<NodeExpression *>(static_cast<void *>(obj));
 }
-//end DivisionExpression
-
-
-
 
 class Printer {
 public:
-    Printer(NodeExpression const &);
+    Printer(const NodeExpression *);
     const NodeExpression * ptr_expression()const;
 private:
     const NodeExpression * expr;
 };
 
-//class Printer
-    //constructors
-Printer::Printer(NodeExpression const & obj):
-    expr(&obj)
+Printer::Printer(const NodeExpression * obj):
+    expr(obj)
 {}
-    //methods
+
 const NodeExpression * Printer::ptr_expression()const
 {
     return expr;
 }
-//end Printer
 
 class PrettyPrinter {
 public:
-    Printer get_infix(NodeExpression const &)const;
+    Printer get_infix(Expression const &)const;
 private:
 };
 
-//class PrettyPrinter
-    //constructors
-    //methods
-Printer PrettyPrinter::get_infix(NodeExpression const & obj)const
+Printer PrettyPrinter::get_infix(Expression const & obj)const
 {
-    return Printer(obj);
+    return Printer(obj.get_node());
 }
-//end PrettyPrinter
 
 std::ostream & operator <<(std::ostream & out, const Printer & obj)
 {
@@ -569,51 +408,54 @@ std::ostream & operator <<(std::ostream & out, const Printer & obj)
     return out;
 }
 
-
-NodeExpression *expr(IntVariable &v)
+Expression operator +(Expression const & left, Expression const & right)
 {
-    return new VariableExpression(v);
+    return new SumExpression(left.get_node() -> clone(),
+                right.get_node() -> clone());
 }
 
-NodeExpression *expr(int v)
+Expression operator -(Expression const & left, Expression const & right)
 {
-    return new LiteralExpression(v);
+    return new SubExpression(left.get_node() -> clone(),
+                right.get_node() -> clone());
 }
 
-NodeExpression *plus(NodeExpression *left, NodeExpression *right)
+Expression operator *(Expression const & left, Expression const & right)
 {
-    return new SumExpression(left, right);
+    return new MultiplyExpression(left.get_node() -> clone(),
+                right.get_node() -> clone());
 }
 
-NodeExpression *minus(NodeExpression *left, NodeExpression *right)
+Expression operator /(Expression const & left, Expression const & right)
 {
-    return new SubExpression(left, right);
+    return new DivisionExpression(left.get_node() -> clone(),
+                right.get_node() -> clone());
 }
 
-NodeExpression *mult(NodeExpression *left, NodeExpression *right)
+Expression operator -(Expression const & middle)
 {
-    return new MultiplyExpression(left, right);
+    return new NegativeExpression(middle.get_node() -> clone());
 }
 
-NodeExpression *div(NodeExpression *left, NodeExpression *right)
-{
-    return new DivisionExpression(left, right);
-}
-
-NodeExpression *neg(NodeExpression *operand)
-{
-    return new NegativeExpression(operand);
-}
 
 }//end namespace equation
 
-#ifdef LE
+#ifdef LEO
 int
 main()
 {
     using namespace equations;
     IntVariable x("x");
-    Expression expression
+    Expression expr1 = x + (x + x) ;
+    Expression expr2 = expr1 - expr1;
+    Expression expr3 = expr1 * expr2;
+    Expression expr4 = expr1 / expr2;
+    Expression expr5 = -expr4;
+    PrettyPrinter printer;
+    std::cout<< printer.get_infix(-expr1) << std::endl;
+    //std::cout<< printer.get_infix(expr2) << std::endl;
+    //std::cout<< printer.get_infix(expr3) << std::endl;
+    //std::cout<< printer.get_infix(expr4) << std::endl;
 
     
 }
