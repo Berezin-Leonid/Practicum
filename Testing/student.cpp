@@ -12,18 +12,18 @@ public:
 
     const char * get_name()const;
     const char * get_surname()const;
-    int get_age()const;
+    int get_grade()const;
 
     void set_name(String const &);
     void set_surname(String const &);
-    void set_age(int);
+    void set_grade(int);
     Student & operator =(Student);
     
 private:
 
     String name;
     String surname;
-    int age;
+    int grade;
 };
 
 void Student::set_name(String const & obj)
@@ -33,10 +33,10 @@ void Student::set_name(String const & obj)
 
 void Student::set_surname(String const & obj)
 {
-    name = obj;
+    surname = obj;
 }
 
-void Student::set_age(int x)
+void Student::set_grade(int x)
 {
     age = x;
 }
@@ -45,22 +45,22 @@ const char * Student::get_name()const {return name.string();}
 
 const char * Student::get_surname()const {return surname.string();}
 
-int Student::get_age()const {return age;}
+int Student::get_grade()const {return grade;}
 
 
 Student::Student():
-        name(nullptr), surname(nullptr), age(0)
+        name(nullptr), surname(nullptr), grade(0)
 {}
 
 Student::Student(String const & obj1, String const & obj2, int x):
-        name(obj1), surname(obj2), age(x)
+        name(obj1), surname(obj2), grade(x)
 {}
 
 Student::Student(Student const & obj): Student()
 {
     name = obj.name;
     surname = obj.surname;
-    age = obj.age;
+    grade = obj.grade;
 }
 
 Student::~Student()
@@ -71,7 +71,7 @@ Student & Student::operator =(Student obj)
 {
     std::swap(name, obj.name);
     std::swap(surname, obj.surname);
-    std::swap(age, obj.age);
+    std::swap(age, obj.grade);
     return *this;
 }
 
@@ -87,7 +87,7 @@ main()
     //obj2 = obj;
     obj2 = obj = obj2;
     std::cout << obj2.get_name() << " " << obj2.get_surname() << " " << 
-            obj2.get_age() << std::endl;
+            obj2.get_grade() << std::endl;
     return 0;
 }
 #endif
