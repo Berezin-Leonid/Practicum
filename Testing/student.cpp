@@ -6,7 +6,7 @@ class Student {
 public:
 
     Student();
-    Student(String const &, String const &, int);
+    Student(const char *, const char *, int);
     Student(Student const &);
     ~Student();
 
@@ -14,10 +14,9 @@ public:
     const char * get_surname()const;
     int get_grade()const;
 
-    void set_name(String const &);
-    void set_surname(String const &);
+    void set_name(const char *);
+    void set_surname(const char *);
     void set_grade(int);
-    Student & operator =(Student);
     
 private:
 
@@ -26,12 +25,12 @@ private:
     int grade;
 };
 
-void Student::set_name(String const & obj)
+void Student::set_name(const char * obj)
 {
     name = obj;
 }
 
-void Student::set_surname(String const & obj)
+void Student::set_surname(const char * obj)
 {
     surname = obj;
 }
@@ -52,7 +51,7 @@ Student::Student():
         name(nullptr), surname(nullptr), grade(0)
 {}
 
-Student::Student(String const & obj1, String const & obj2, int x):
+Student::Student(const char * obj1, const char * obj2, int x):
         name(obj1), surname(obj2), grade(x)
 {}
 
@@ -66,15 +65,6 @@ Student::Student(Student const & obj)
 Student::~Student()
 {}
 
-
-Student & Student::operator =(Student obj)
-{
-    std::swap(name, obj.name);
-    std::swap(surname, obj.surname);
-    std::swap(grade, obj.grade);
-    return *this;
-}
-
 #ifdef LEO
 int
 main()
@@ -84,7 +74,7 @@ main()
     Student obj2("C","D", 19);
     std::cout << obj2.get_name() << " " << obj2.get_surname() << " " << 
             obj2.get_grade() << std::endl;
-    //obj2 = obj;
+
     obj2 = obj = obj2;
     std::cout << obj2.get_name() << " " << obj2.get_surname() << " " << 
             obj2.get_grade() << std::endl;
