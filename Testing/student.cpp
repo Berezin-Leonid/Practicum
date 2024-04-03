@@ -6,74 +6,64 @@ class Student {
 public:
 
     Student();
-    Student(String const &, String const &, int);
+    Student(const char *, const char *, int);
     Student(Student const &);
     ~Student();
 
     const char * get_name()const;
     const char * get_surname()const;
-    int get_age()const;
+    int get_grade()const;
 
-    void set_name(String const &);
-    void set_surname(String const &);
-    void set_age(int);
-    Student & operator =(Student);
+    void set_name(const char *);
+    void set_surname(const char *);
+    void set_grade(int);
     
 private:
 
     String name;
     String surname;
-    int age;
+    int grade;
 };
 
-void Student::set_name(String const & obj)
+void Student::set_name(const char * obj)
 {
     name = obj;
 }
 
-void Student::set_surname(String const & obj)
+void Student::set_surname(const char * obj)
 {
-    name = obj;
+    surname = obj;
 }
 
-void Student::set_age(int x)
+void Student::set_grade(int x)
 {
-    age = x;
+    grade = x;
 }
 
 const char * Student::get_name()const {return name.string();}
 
 const char * Student::get_surname()const {return surname.string();}
 
-int Student::get_age()const {return age;}
+int Student::get_grade()const {return grade;}
 
 
 Student::Student():
-        name(nullptr), surname(nullptr), age(0)
+        name(nullptr), surname(nullptr), grade(0)
 {}
 
-Student::Student(String const & obj1, String const & obj2, int x):
-        name(obj1), surname(obj2), age(x)
+Student::Student(const char * obj1, const char * obj2, int x):
+        name(obj1), surname(obj2), grade(x)
 {}
 
-Student::Student(Student const & obj): Student()
+Student::Student(Student const & obj)
 {
     name = obj.name;
     surname = obj.surname;
-    age = obj.age;
+    grade = obj.grade;
 }
 
 Student::~Student()
 {}
-
-
-Student & Student::operator =(Student obj)
-{
-    std::swap(name, obj.name);
-    std::swap(surname, obj.surname);
-    std::swap(age, obj.age);
-    return *this;
-}
 
 #ifdef LEO
 int
@@ -83,11 +73,11 @@ main()
     Student obj("A","B", 18);
     Student obj2("C","D", 19);
     std::cout << obj2.get_name() << " " << obj2.get_surname() << " " << 
-            obj2.get_age() << std::endl;
-    //obj2 = obj;
+            obj2.get_grade() << std::endl;
+
     obj2 = obj = obj2;
     std::cout << obj2.get_name() << " " << obj2.get_surname() << " " << 
-            obj2.get_age() << std::endl;
+            obj2.get_grade() << std::endl;
     return 0;
 }
 #endif
