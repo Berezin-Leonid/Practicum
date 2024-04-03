@@ -6,6 +6,8 @@ enum {
     TOKEN_SIZE = 10
 };
 
+void fill_by_different_strings(std::string *, size_t, size_t);
+
 class TokenPool {
 public:
     TokenPool(size_t);
@@ -76,7 +78,7 @@ void TokenPool::return_token(const char * addr)
 }
 
 
-#ifdef LEO
+#ifdef LEO2
 int
 main()
 {
