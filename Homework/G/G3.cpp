@@ -15,7 +15,7 @@ public:
     ~TokenizedAction();
     void run();
 private:
-    TokenPool tok_obj;
+    TokenPool & tok_obj;
     std::string token;
     Action & action;
 };
