@@ -11,11 +11,9 @@ typename T::value_type last3(T const & obj)
     }
 
     typename T::const_iterator it = obj.end();
-
     --it;
     --it;
     --it;
-
     return *it++ + *it++ + *it++;
 }
 
