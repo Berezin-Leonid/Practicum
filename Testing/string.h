@@ -1,4 +1,6 @@
+#include <iostream>
 #include <cstring>
+
 class String {
 public:
     String();
@@ -13,24 +15,21 @@ private:
     char * str;
 };
 
-String::String(): str(nullptr)
-{}
+String::String()
+{
+    str = new char[1];
+    strcpy(str,"\0");
+}
+
+
 String::String(const char *_str)
 {
-    if (_str == nullptr) {
-        str = nullptr;
-        return;
-    }
     str = new char[strlen(_str) + 1];
     strcpy(str, _str);
 }
 
 String::String(String const & obj)
 {
-    if (obj.str == nullptr) {
-        str = nullptr;
-        return;
-    }
     str = new char[strlen(obj.str) + 1];
     strcpy(str, obj.str);
 }
@@ -42,9 +41,7 @@ String::~String()
 
 String & String::operator =(String obj)
 {
-    if (this != &obj) {
-        swap(obj);
-    }
+    swap(obj);
     return *this;
 }
 
@@ -67,9 +64,10 @@ main()
     String str2 = "Hi Ken";
 
     std::cout << str1.string() << std::endl;
+    str2 = str2;
     str2 = str1 = str2;
     String str3 = str2;
-    std::cout << str1.string() << std::endl;
+    std::cout << str3.string() << std::endl;
     return 0;
 }
 #endif

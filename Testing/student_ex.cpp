@@ -5,7 +5,6 @@
 class Student {
 public:
 
-    Student();
     Student(const char *, const char *, int);
     Student(Student const &);
     ~Student();
@@ -47,11 +46,6 @@ const char * Student::get_name()const {return name.string();}
 const char * Student::get_surname()const {return surname.string();}
 
 int Student::get_grade()const {return grade;}
-
-
-Student::Student():
-        name(nullptr), surname(nullptr), grade(0)
-{}
 
 Student::Student(const char * obj1, const char * obj2, int x):
         name(obj1), surname(obj2), grade(x)
