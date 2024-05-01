@@ -1,23 +1,93 @@
 #include <iostream>
+#include <sstream>
 
 class Parser {
 public:
-    Parser();
+    Parser() = default;
     bool parse(std::istream &);
 private:
+    std::istream * in;
+    char c;
+    void A();
+    void B();
+    void S();
+    void gc();
 };
 
 
+void Parser::gc() {
+    if (!in -> get(c)) {
+        c = 0;
+    }
+}
 
-bool Parser::parse(std::istream & in)
+void Parser::S() {
+    //"S-->AS | B"
+    if (c == 'b' || c == 'c') {
+        A();
+        S(); 
+    } else {
+        B();
+    }
+    
+}
+
+
+void Parser::A() {
+    //"A-->b | c"
+    if (c == 'b' || c == 'c') {
+        gc(); 
+    } else {
+        throw c;
+    }
+}
+
+void Parser::B() {
+    //"B--> dBf | a | eps"
+    if (c == 'd') {
+        gc();
+        B();
+        if (c == 'f') {
+            gc();
+        }
+        else {throw c;}
+    } else if (c == 'a') {
+        gc();
+    }
+}
+
+
+
+bool Parser::parse(std::istream & _in)
 {
-    std::stringstream ss1;
-    std::stringstream ss2
+    in = &_in;
+    try {
+        gc();
+        S();
+        if (in -> eof() == false) {
+            throw c;
+        }
+        return true; 
+    } catch (char x) {
+        return false;
+    }
+}
 
-    std::string str;
 
-    in >> str;
-    ss1<< str;
+int
+main()
+{
+    Parser parser;
+    std::string line;
+    while (std::getline(std::cin, line)) {
+        std::stringstream ss;
+        ss << line;
+        if (parser.parse(ss)) {
+            std::cout << "YES" << std::endl;
+        } else {
+            std::cout << "NO" << std::endl;
+        }
+    }
 
-    while(){}
+    return 0;
 }
