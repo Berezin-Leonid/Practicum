@@ -135,46 +135,110 @@ T MultiSet<T>::del(int index) {
     return obj;
 }
 
-/*
-*/
+
+class Component {
+public:
+    Component();
+    Component(const Component &) = delete;
+    Component & operator = (const Component &) = delete;
+    virtual ~Component();
+    int count() const;
+    Component & subcomponent(int);
+    const Component & subcomponent(int) const;
+    void add(Component &);
+    friend std::ostream & operator << (std::ostream &, const Component &);
+protected:
+    MultiSet<Component *> multi_set;
+private:
+    virtual const std::string & name() const = 0;
+};
+
+
+Component::Component(): multi_set()
+{}
+
+Component::~Component()
+{}
+
+
+int
+Component::count () const
+{
+    return multi_set.size();
+}
+
+Component & Component::subcomponent(int index) {
+    return *(multi_set[index]);
+}
+
+const Component & Component::subcomponent(int index) const {
+    return *(multi_set[index]);
+}
+
+
+void Component::add(Component & obj) {
+    multi_set.add(&obj); 
+}
+
+
+std::ostream & operator << (std::ostream & ss, const Component & obj) {
+    ss << obj.name() << "(";
+    for (int i = 00; i < obj.multi_set.size(); ++i) {
+        ss << *(obj.multi_set[i]);
+        if (i < obj.multi_set.size() - 1) {
+            ss << ", ";
+        }
+    }
+    ss << ")";
+    return ss;
+}
+
+
+class Box: public Component {
+public:
+    Box(const std::string &);
+    Box(const Box &);
+    Box & operator = (const Box & other);
+    ~Box();
+private:
+    const std::string & name() const;
+    std::string str;
+};
+
+
+Box::Box(const std::string &s):
+    Component(), str(s)
+{}
+
+Box::Box(const Box & other):
+    Component(), str(other.str)
+{}
+
+Box & Box::operator = (const Box & other)
+{
+    if (this != & other) {
+        multi_set.clear();
+        str = other.str;
+    }
+    return  * this;
+}
+
+Box::~Box()
+{}
+
+const std::string & Box::name() const
+{
+    return str;
+}
 
 #ifdef LEO
 int
 main()
 {
-    MultiSet<int> a;
-    a.add(100);
-    a.add(200);
-    a.add(300);
-    MultiSet<int> b(a,10);
-    b.clear();
-    b = a;
-
-    b.del(1);
-    std::cout << b[0] << std::endl;
-
-//===================================================================
-
-    MultiSet<std::string> a1;
-    a1.add("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
-    a1.add("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb");
-    a1.add("cccccccccccccccccccccccccccccccccccccccccccccccccc");
-    MultiSet<std::string> b1;
-    b1.clear();
-    b1 = a1;
-
-    std::cout << b1[2] << std::endl;
-
-    //const check
-
-    MultiSet<std::string> a2;
-    a2.add("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
-    a2.add("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb");
-    a2.add("cccccccccccccccccccccccccccccccccccccccccccccccccc");
-
-    const MultiSet<std::string> b2 = a2;
-    std::cout << b2[0] << std::endl;
-
+    Box b1("a"), b2("b"), b3("c");
+    b1.add(b2);
+    b1.add(b3);
+    std::cout << b1 << std::endl;
     return 0;
 }
 #endif
