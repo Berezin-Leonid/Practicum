@@ -33,7 +33,7 @@ Parser::match(LexType type)
     if (type == cur_lex) {
         lexParse();
     } else {
-        throw 2;
+        throw 1;
     }
 }
 
