@@ -126,11 +126,6 @@ Parser::A()
 void
 Parser::P()
 {
-    if (cur_lex == IDENT) {
-        E();
-        match(RIGHT_BR);
-    } else 
-
     switch (cur_lex) {
         case IDENT:
                 E();
