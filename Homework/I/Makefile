@@ -1,4 +1,4 @@
-NAME = student_ex
+NAME = I4
 FLAG = LEO
 
 COMP:
